@@ -1,0 +1,63 @@
+{
+  "name": "@econsignlabs/hey-api-zod-operation-data",
+  "version": "0.1.0",
+  "description": "HeyAPI plugin that composes operation-level Zod schemas for server route handlers",
+  "keywords": [
+    "hey-api",
+    "openapi",
+    "zod",
+    "codegen",
+    "typescript"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/econsignlabs/hey-api-zod-operation-data#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/econsignlabs/hey-api-zod-operation-data.git"
+  },
+  "bugs": {
+    "url": "https://github.com/econsignlabs/hey-api-zod-operation-data/issues"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "tsdown",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build && npm pack --dry-run",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@hey-api/openapi-ts": "0.99.x",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "@hey-api/openapi-ts": "0.99.0",
+    "eslint": "^9.39.4",
+    "prettier": "^3.9.0",
+    "tsdown": "^0.17.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.48.0",
+    "vitest": "^4.1.0",
+    "zod": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}
