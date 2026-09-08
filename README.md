@@ -29,16 +29,16 @@ The initial release supports HeyAPI 0.99 and Zod 4.
 Add the plugin after configuring HeyAPI's Zod plugin:
 
 ```ts
-import { defineConfig as defineOperationData } from '@econsignlabs/hey-api-zod-operation-data';
-import { defineConfig } from '@hey-api/openapi-ts';
+import { defineConfig as defineOperationData } from "@econsignlabs/hey-api-zod-operation-data";
+import { defineConfig } from "@hey-api/openapi-ts";
 
 export default defineConfig({
-  input: './openapi.json',
-  output: './generated/api',
+  input: "./openapi.json",
+  output: "./generated/api",
   plugins: [
-    '@hey-api/typescript',
+    "@hey-api/typescript",
     {
-      name: 'zod',
+      name: "zod",
       requests: { shouldExtract: true },
       responses: true,
     },
@@ -50,7 +50,7 @@ export default defineConfig({
 The generated schemas are added to HeyAPI's existing `zod.gen.ts` file:
 
 ```ts
-import { zPostWidgetData } from './generated/api/zod.gen';
+import { zPostWidgetData } from "./generated/api/zod.gen";
 
 const routeSchema = zPostWidgetData.shape;
 ```

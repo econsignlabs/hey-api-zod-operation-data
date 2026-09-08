@@ -1,10 +1,10 @@
-import type { DefinePlugin, Plugin } from '@hey-api/openapi-ts';
+import type { DefinePlugin, Plugin } from "@hey-api/openapi-ts";
 
-export type UserConfig = Plugin.Name<'zod-operation-data'> &
+export type UserConfig = Plugin.Name<"zod-operation-data"> &
   Plugin.Hooks &
   Plugin.UserExports;
 
-export type Config = Plugin.Name<'zod-operation-data'> &
+export type Config = Plugin.Name<"zod-operation-data"> &
   Plugin.Hooks &
   Plugin.Exports;
 
@@ -15,8 +15,8 @@ export type ZodOperationDataPlugin = DefinePlugin<
   never
 >;
 
-declare module '@hey-api/shared' {
+declare module "@hey-api/shared" {
   interface PluginConfigMap {
-    'zod-operation-data': ZodOperationDataPlugin;
+    "zod-operation-data": ZodOperationDataPlugin;
   }
 }

@@ -1,17 +1,17 @@
-import { definePluginConfig } from '@hey-api/openapi-ts';
+import { definePluginConfig } from "@hey-api/openapi-ts";
 
-import { handler } from './plugin.js';
-import type { ZodOperationDataPlugin } from './types.js';
+import { handler } from "./plugin.js";
+import type { ZodOperationDataPlugin } from "./types.js";
 
-export const defaultConfig: ZodOperationDataPlugin['Config'] = {
+export const defaultConfig: ZodOperationDataPlugin["Config"] = {
   config: {
     includeInEntry: false,
   },
-  dependencies: ['@hey-api/typescript', 'zod'],
+  dependencies: ["@hey-api/typescript", "zod"],
   handler,
-  name: 'zod-operation-data',
+  name: "zod-operation-data",
   symbolMeta() {
-    return { artifact: 'zod-operation-data' };
+    return { artifact: "zod-operation-data" };
   },
 };
 
