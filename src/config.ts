@@ -10,9 +10,6 @@ export const defaultConfig: ZodOperationDataPlugin["Config"] = {
   dependencies: ["@hey-api/typescript", "zod"],
   handler,
   name: "zod-operation-data",
-  symbolMeta() {
-    return { artifact: "zod-operation-data" };
-  },
 };
 
 export const defineConfig = definePluginConfig(defaultConfig);
