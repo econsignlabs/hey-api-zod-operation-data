@@ -4,11 +4,44 @@ import type { ZodOperationDataPlugin } from "./types.js";
 
 const requestLayers = ["body", "headers", "path", "query"] as const;
 
+type OperationWithPermissions = {
+  "x-permissions"?: string | ReadonlyArray<string>;
+};
+
+const getPermissions = (operation: OperationWithPermissions) => {
+  const permissions = operation["x-permissions"];
+
+  if (typeof permissions === "string") {
+    return permissions.trim() ? permissions.trim().split(/\s+/) : [];
+  }
+
+  if (!Array.isArray(permissions)) return [];
+
+  return permissions.filter((permission) => typeof permission === "string");
+};
+
 export const handler: ZodOperationDataPlugin["Handler"] = ({ plugin }) => {
   const zodPlugin = plugin.getPluginOrThrow("zod");
 
   plugin.forEach("operation", ({ operation }) => {
+    const permissions = getPermissions(
+      operation as unknown as OperationWithPermissions,
+    );
+
     const shape = $.object();
+
+    if (permissions.length) {
+      shape.prop(
+        "permissions",
+        $(zodPlugin.imports.z)
+          .attr("array")
+          .call(
+            $(zodPlugin.imports.z)
+              .attr("enum")
+              .call($.array(...permissions)),
+          ),
+      );
+    }
 
     for (const layer of requestLayers) {
       const schema = plugin.querySymbol({

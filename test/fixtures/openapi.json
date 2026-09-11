@@ -8,6 +8,7 @@
     "/widgets/{widgetId}": {
       "post": {
         "operationId": "postWidget",
+        "x-permissions": ["shipments:read", "users:write"],
         "parameters": [
           {
             "in": "path",
