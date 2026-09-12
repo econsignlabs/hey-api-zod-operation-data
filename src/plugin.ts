@@ -22,26 +22,62 @@ const getPermissions = (operation: OperationWithPermissions) => {
 
 export const handler: ZodOperationDataPlugin["Handler"] = ({ plugin }) => {
   const zodPlugin = plugin.getPluginOrThrow("zod");
+  const operationPermissionsMap: Record<string, string[]> = {};
 
   plugin.forEach("operation", ({ operation }) => {
+    const rawPermissions = (operation as unknown as OperationWithPermissions)[
+      "x-permissions"
+    ];
+
+    if (plugin.config.requirePermissions && rawPermissions === undefined) {
+      throw new Error(
+        `Operation "${operation.id}" is missing required "x-permissions". Use an explicit empty array [] if no permissions are required.`,
+      );
+    }
+
+    if (rawPermissions !== undefined) {
+      if (
+        typeof rawPermissions !== "string" &&
+        !Array.isArray(rawPermissions)
+      ) {
+        throw new Error(
+          `Operation "${operation.id}" has invalid "x-permissions": expected string[] or string, got ${typeof rawPermissions}.`,
+        );
+      }
+      if (Array.isArray(rawPermissions)) {
+        for (const perm of rawPermissions) {
+          if (typeof perm !== "string") {
+            throw new Error(
+              `Operation "${operation.id}" has invalid permission item in "x-permissions": expected string, got ${typeof perm}.`,
+            );
+          }
+        }
+      }
+    }
+
     const permissions = getPermissions(
       operation as unknown as OperationWithPermissions,
     );
+    const sortedPermissions = [...permissions].sort();
+    operationPermissionsMap[operation.id] = sortedPermissions;
 
     const shape = $.object();
 
-    if (permissions.length) {
-      shape.prop(
-        "permissions",
-        $(zodPlugin.imports.z)
-          .attr("array")
-          .call(
-            $(zodPlugin.imports.z)
-              .attr("enum")
-              .call($.array(...permissions)),
-          ),
-      );
-    }
+    shape.prop(
+      "operationId",
+      $(zodPlugin.imports.z).attr("literal").call($.literal(operation.id)),
+    );
+
+    shape.prop(
+      "permissions",
+      $(zodPlugin.imports.z)
+        .attr("array")
+        .call(
+          $(zodPlugin.imports.z)
+            .attr("enum")
+            .call($.array(...sortedPermissions)),
+        ),
+    );
 
     for (const layer of requestLayers) {
       const schema = plugin.querySymbol({
@@ -105,4 +141,53 @@ export const handler: ZodOperationDataPlugin["Handler"] = ({ plugin }) => {
         .assign($(zodPlugin.imports.z).attr("object").call(shape)),
     );
   });
+
+  const sortedOpIds = Object.keys(operationPermissionsMap).sort();
+  const sortedMap: Record<string, readonly string[]> = {};
+  for (const opId of sortedOpIds) {
+    sortedMap[opId] = operationPermissionsMap[opId]!;
+  }
+
+  const opPermsSymbol = plugin.symbol("operationPermissions", {
+    getFilePath: () => "permissions",
+  });
+  plugin.node(
+    $.const(opPermsSymbol)
+      .export()
+      .assign($($.fromValue(sortedMap, { layout: "pretty" })).as("const")),
+  );
+
+  const typeOpPermsSymbol = plugin.symbol("OperationPermissions", {
+    getFilePath: () => "permissions",
+  });
+  plugin.node(
+    $.type
+      .alias(typeOpPermsSymbol)
+      .export()
+      .type($.type(opPermsSymbol).typeofType()),
+  );
+
+  const typeOpIdSymbol = plugin.symbol("OperationId", {
+    getFilePath: () => "permissions",
+  });
+  plugin.node(
+    $.type
+      .alias(typeOpIdSymbol)
+      .export()
+      .type($.type(typeOpPermsSymbol).keyof()),
+  );
+
+  const typePermSymbol = plugin.symbol("Permission", {
+    getFilePath: () => "permissions",
+  });
+  plugin.node(
+    $.type
+      .alias(typePermSymbol)
+      .export()
+      .type(
+        $.type(typeOpPermsSymbol)
+          .idx($.type(typeOpIdSymbol))
+          .idx($.type("number")),
+      ),
+  );
 };

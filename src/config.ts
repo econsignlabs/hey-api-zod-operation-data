@@ -6,6 +6,7 @@ import type { ZodOperationDataPlugin } from "./types.js";
 export const defaultConfig: ZodOperationDataPlugin["Config"] = {
   config: {
     includeInEntry: false,
+    requirePermissions: false,
   },
   dependencies: ["@hey-api/typescript", "zod"],
   handler,
