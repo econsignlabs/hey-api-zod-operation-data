@@ -30,7 +30,6 @@ describe("zod-operation-data", () => {
     });
 
     const generated = await readFile(resolve(output, "zod.gen.ts"), "utf8");
-
     expect(generated).toContain("export const zPostWidgetData = z.object({");
     expect(generated).toContain("body: zPostWidgetBody");
     expect(generated).toContain("path: zPostWidgetPath");
@@ -39,6 +38,12 @@ describe("zod-operation-data", () => {
     expect(generated).toContain(
       "responses: z.custom<PostWidgetResponses & PostWidgetErrors>()",
     );
+    expect(generated).toContain(
+      "permissions: z.array(z.enum(['shipments:read', 'users:write']))",
+    );
+    await expect(
+      access(resolve(output, "permissions.gen.ts")),
+    ).rejects.toThrow();
     await expect(
       access(resolve(output, "zod-operation-data.gen.ts")),
     ).rejects.toThrow();
