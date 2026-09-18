@@ -63,21 +63,8 @@ export const handler: ZodOperationDataPlugin["Handler"] = ({ plugin }) => {
 
     const shape = $.object();
 
-    shape.prop(
-      "operationId",
-      $(zodPlugin.imports.z).attr("literal").call($.literal(operation.id)),
-    );
-
-    shape.prop(
-      "permissions",
-      $(zodPlugin.imports.z)
-        .attr("array")
-        .call(
-          $(zodPlugin.imports.z)
-            .attr("enum")
-            .call($.array(...sortedPermissions)),
-        ),
-    );
+    shape.prop("operationId", $($.literal(operation.id)).as("const"));
+    shape.prop("permissions", $($.array(...sortedPermissions)).as("const"));
 
     for (const layer of requestLayers) {
       const schema = plugin.querySymbol({
@@ -135,11 +122,7 @@ export const handler: ZodOperationDataPlugin["Handler"] = ({ plugin }) => {
       },
     );
 
-    zodPlugin.node(
-      $.const(symbol)
-        .export()
-        .assign($(zodPlugin.imports.z).attr("object").call(shape)),
-    );
+    zodPlugin.node($.const(symbol).export().assign(shape));
   });
 
   const sortedOpIds = Object.keys(operationPermissionsMap).sort();
