@@ -70,6 +70,20 @@ The generated object can also include:
 
 Only request and response fields available for an operation are emitted.
 
+### Operation extension metadata
+
+Configure `metadataFields` to emit selected OpenAPI operation extensions to
+`metadata.gen.ts`. Field names include the `x-` prefix, and fields absent from
+an operation are omitted:
+
+```ts
+defineOperationData({ metadataFields: ["x-enterprise"] });
+```
+
+The generated `operationMetadata` map is keyed by operation ID and preserves
+literal value types, so consumers can use
+`operationMetadata[operationId]?.["x-enterprise"]`.
+
 ### Migration
 
 `z*Data` exports are now plain objects rather than `z.object()` schemas. Pass `zPostWidgetData` directly instead of `zPostWidgetData.shape`. Read `operationId` directly instead of `operationId.value`, and pass `permissions` directly to authorization middleware. For runtime request validation, use the individual body, headers, path, or query schemas; metadata is not request data. Route wrappers that expect Zod metadata must update their input types to accept a string operation ID and `readonly string[]` permissions.

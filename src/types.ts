@@ -10,12 +10,20 @@ export type UserConfig = Plugin.Name<"zod-operation-data"> &
      * @default false
      */
     requirePermissions?: boolean;
+    /**
+     * OpenAPI operation extension fields to emit in `operationMetadata`.
+     * Use the full extension name, such as `x-enterprise`.
+     *
+     * @default []
+     */
+    metadataFields?: string[];
   };
 
 export type Config = Plugin.Name<"zod-operation-data"> &
   Plugin.Hooks &
   Plugin.Exports & {
     requirePermissions: boolean;
+    metadataFields: string[];
   };
 
 export type ZodOperationDataPlugin = DefinePlugin<

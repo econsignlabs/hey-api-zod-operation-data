@@ -23,6 +23,8 @@ const getPermissions = (operation: OperationWithPermissions) => {
 export const handler: ZodOperationDataPlugin["Handler"] = ({ plugin }) => {
   const zodPlugin = plugin.getPluginOrThrow("zod");
   const operationPermissionsMap: Record<string, string[]> = {};
+  const operationMetadataMap: Record<string, Record<string, unknown>> = {};
+  const metadataFields = plugin.config.metadataFields;
 
   plugin.forEach("operation", ({ operation }) => {
     const rawPermissions = (operation as unknown as OperationWithPermissions)[
@@ -60,6 +62,17 @@ export const handler: ZodOperationDataPlugin["Handler"] = ({ plugin }) => {
     );
     const sortedPermissions = [...permissions].sort();
     operationPermissionsMap[operation.id] = sortedPermissions;
+
+    if (metadataFields.length) {
+      const metadata: Record<string, unknown> = {};
+      for (const field of metadataFields) {
+        const value = (operation as unknown as Record<string, unknown>)[field];
+        if (value !== undefined) metadata[field] = value;
+      }
+      if (Object.keys(metadata).length) {
+        operationMetadataMap[operation.id] = metadata;
+      }
+    }
 
     const shape = $.object();
 
@@ -139,6 +152,23 @@ export const handler: ZodOperationDataPlugin["Handler"] = ({ plugin }) => {
       .export()
       .assign($($.fromValue(sortedMap, { layout: "pretty" })).as("const")),
   );
+
+  if (metadataFields.length) {
+    const sortedMetadata: Record<string, Record<string, unknown>> = {};
+    for (const opId of Object.keys(operationMetadataMap).sort()) {
+      sortedMetadata[opId] = operationMetadataMap[opId]!;
+    }
+    const metadataSymbol = plugin.symbol("operationMetadata", {
+      getFilePath: () => "metadata",
+    });
+    plugin.node(
+      $.const(metadataSymbol)
+        .export()
+        .assign(
+          $($.fromValue(sortedMetadata, { layout: "pretty" })).as("const"),
+        ),
+    );
+  }
 
   const typeOpPermsSymbol = plugin.symbol("OperationPermissions", {
     getFilePath: () => "permissions",
