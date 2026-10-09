@@ -7,6 +7,7 @@ export const defaultConfig: ZodOperationDataPlugin["Config"] = {
   config: {
     includeInEntry: false,
     requirePermissions: false,
+    metadataFields: [],
   },
   dependencies: ["@hey-api/typescript", "zod"],
   handler,
