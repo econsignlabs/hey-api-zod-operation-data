@@ -77,7 +77,7 @@ Configure `metadataFields` to emit selected OpenAPI operation extensions to
 an operation are omitted:
 
 ```ts
-defineOperationData({ metadataFields: ["x-enterprise"] })
+defineOperationData({ metadataFields: ["x-enterprise"] });
 ```
 
 The generated `operationMetadata` map is keyed by operation ID and preserves

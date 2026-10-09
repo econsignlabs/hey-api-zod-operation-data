@@ -164,7 +164,9 @@ export const handler: ZodOperationDataPlugin["Handler"] = ({ plugin }) => {
     plugin.node(
       $.const(metadataSymbol)
         .export()
-        .assign($($.fromValue(sortedMetadata, { layout: "pretty" })).as("const")),
+        .assign(
+          $($.fromValue(sortedMetadata, { layout: "pretty" })).as("const"),
+        ),
     );
   }
 
